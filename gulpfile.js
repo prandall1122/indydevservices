@@ -123,6 +123,7 @@ function watchFiles() {
 // Copy production files to dist folder
 function copyToDist() {
   return gulp.src([
+      "./index.html",
       "./css/**",
       "./js/**",
       "./img/**",
