@@ -6,6 +6,7 @@ const browsersync = require("browser-sync").create();
 const cleanCSS = require("gulp-clean-css");
 const del = require("del");
 const gulp = require("gulp");
+const babel = require("gulp-babel");
 // const header = require("gulp-header");
 const merge = require("merge-stream");
 const plumber = require("gulp-plumber");
@@ -60,9 +61,9 @@ function modules() {
     .pipe(gulp.dest('./vendor/jquery-easing'));
   // jQuery
   var jquery = gulp.src([
-      './node_modules/jquery/dist/*',
-      '!./node_modules/jquery/dist/core.js'
-    ])
+    './node_modules/jquery/dist/*',
+    '!./node_modules/jquery/dist/core.js'
+  ])
     .pipe(gulp.dest('./vendor/jquery'));
   return merge(bootstrap, fontAwesome, jquery, jqueryEasing);
 }
@@ -84,7 +85,7 @@ function css() {
     // .pipe(header(banner, {
     //   pkg: pkg
     // }))
-    .pipe(gulp.dest("./css"))
+    //.pipe(gulp.dest("./css"))
     .pipe(rename({
       suffix: ".min"
     }))
@@ -99,9 +100,11 @@ function js() {
     .src([
       './js/*.js',
       '!./js/*.min.js',
-      '!./js/contact_me.js',
       '!./js/jqBootstrapValidation.js'
     ])
+    .pipe(babel({
+      presets: ['@babel/env']
+    }))
     .pipe(uglify())
     // .pipe(header(banner, {
     //   pkg: pkg
@@ -116,19 +119,19 @@ function js() {
 // Watch files
 function watchFiles() {
   gulp.watch("./scss/**/*", css);
-  gulp.watch("./js/**/*", js);
+  gulp.watch(["./js/**/*", "!./js/**/*.min.js"], js);
   gulp.watch("./**/*.html", browserSyncReload);
 }
 
 // Copy production files to dist folder
 function copyToDist() {
   return gulp.src([
-      "./index.html",
-      "./css/**",
-      "./js/**",
-      "./img/**",
-      "./vendor/**"
-    ], {
+    "./index.html",
+    "./css/**",
+    "./js/**",
+    "./img/**",
+    "./vendor/**"
+  ], {
       base: '.'
     })
     .pipe(gulp.dest("./dist/"));
